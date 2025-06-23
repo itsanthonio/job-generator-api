@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends, Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from api.v1.schemas.job import JobRequest, JobResponse
@@ -15,6 +15,7 @@ limiter = Limiter(key_func=get_remote_address)
 @router.post("/jobs", response_model=JobResponse, status_code=status.HTTP_201_CREATED)
 @limiter.limit("5/minute")
 async def generate_job_description(
+    request: Request,  # This is required for slowapi rate limiting
     job_request: JobRequest,
     generator: JobGeneratorService = Depends(JobGeneratorService)
 ):
